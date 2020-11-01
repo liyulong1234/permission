@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.DeptDao">
+
+    <!--列表查询-->
+    <select id="selectList" resultType="Dept">
+        select * from dept
+    </select>
+
+    <!--添加功能-->
+    <insert id="insert" parameterType="Dept">
+        insert into dept(dname,local) value(#{dname},#{local})
+    </insert>
+
+    <!--主键查询-->
+    <select id="selectDeptByID" parameterType="int" resultType="Dept">
+        select * from dept where deptno = #{deptno}
+    </select>
+
+    <!--修改功能-->
+    <update id="update" parameterType="Dept">
+        update dept set dname = #{dname},local = #{local} where deptno = #{deptno}
+    </update>
+
+    <!--删除一项-->
+    <delete id="deleteOne" parameterType="int">
+        delete from dept where deptno = #{deptno}
+    </delete>
+</mapper>

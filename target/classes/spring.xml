@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--加载properties文件-->
+    <context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+    <!--扫描包-->
+    <context:component-scan base-package="com.offcn">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!--数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${mybatis.driver}"></property>
+        <property name="url" value="${mybatis.url}"></property>
+        <property name="username" value="${mybatis.username}"></property>
+        <property name="password" value="${mybatis.password}"></property>
+        <!--配置其他参数-->
+    </bean>
+    <!--事务管理对象-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--事务注解驱动-->
+    <!--transaction-manager属性设置的是事务管理对象的id-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+    <!--整合mybatis-->
+    <!--SqlSessionFactory工厂-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+        <!--别名-->
+        <property name="typeAliasesPackage" value="com.offcn.bean"></property>
+        <!--映射文件加载-->
+        <property name="mapperLocations" value="classpath:mappers/*.xml"></property>
+        <!--mybatis核心文件加载-->
+        <property name="configLocation" value="classpath:mybatis.xml"></property>
+        <!--分页插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!--使用下面的方式配置参数，一行配置一个 -->
+                        <value>
+                            helperDialect=mysql
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+    <!--代理对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指明持久层位置-->
+        <property name="basePackage" value="com.offcn.dao"></property>
+    </bean>
+
+
+    <!--整合redis功能到项目中来-->
+    <!--连接池配置-->
+    <bean id="pool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="poolConfig" ref="poolConfig"></constructor-arg>
+        <constructor-arg name="host" value="192.168.110.129"></constructor-arg>
+        <constructor-arg name="port" value="6379"></constructor-arg>
+        <constructor-arg name="password" value="123"></constructor-arg>
+        <!--毫秒值-->
+        <!--连接超时时间-->
+        <constructor-arg name="timeout" value="30000"></constructor-arg>
+    </bean>
+    <!--配置参数对象-->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!--配置参数-->
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="10"/>
+        <!-- 空闲连接数 -->
+        <property name="maxIdle" value="2"/>
+        <!-- 设置链接池的连接耗尽时，是否等待 -->
+        <property name="blockWhenExhausted" value="true"/>
+        <!-- 最大等待时间 -->
+        <property name="maxWaitMillis" value="30000"/>
+        <!-- 获取到连接时，是否检查链接的有效性 -->
+        <property name="testOnBorrow" value="true"/>
+    </bean>
+</beans>

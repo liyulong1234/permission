@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.EmployeeDao">
+
+    <!--该关联外键值为null-->
+    <update id="updateDeptId" parameterType="int">
+        UPDATE employee SET dfk = NULL WHERE dfk = #{deptno}
+    </update>
+
+    <!--列表展示-后改造的，有封装查询条件的对象送来，此对象中可能有条件也可能没有条件-->
+    <select id="selectList" parameterType="ConditionBean" resultType="Employee">
+        select * from employee
+        <where>
+            <if test="caption != null and caption.length > 0 and keyword != null and keyword.length > 0">
+                ${caption} like concat('%',#{keyword},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--添加功能-->
+    <insert id="insert" parameterType="Employee">
+        <selectKey resultType="int" order="AFTER" keyColumn="eid" keyProperty="eid">
+            select last_insert_id()
+        </selectKey>
+        INSERT INTO employee 
+        ( 
+            ename, 
+            esex, 
+            eage, 
+            telephone, 
+            hiredate, 
+            pnum, 
+            username, 
+            password, 
+            remark, 
+            dfk, 
+            pic
+        )
+        VALUES
+        (
+            #{ename},
+            #{esex},
+            #{eage},
+            #{telephone},
+            #{hiredate},
+            #{pnum},
+            #{username},
+            #{password},
+            #{remark},
+            #{dfk},
+            #{pic}
+        )
+    </insert>
+
+    <!--按照主键删除-->
+    <delete id="deleteOne" parameterType="int">
+        delete from employee where eid = #{eid}
+    </delete>
+
+
+    <!--主键查询-->
+    <select id="selectByID" parameterType="int" resultType="Employee">
+        select * from employee where eid = #{eid}
+    </select>
+
+
+    <!--修改员工信息-->
+    <update id="update" parameterType="Employee">
+        UPDATE employee 
+        <set>
+            ename = #{ename} ,
+            esex = #{esex} ,
+            eage = #{eage} ,
+            telephone = #{telephone} ,
+            hiredate = #{hiredate} ,
+            pnum = #{pnum} ,
+            username = #{username} ,
+            remark = #{remark} ,
+            dfk = #{dfk}
+            <if test="pic != null and pic.length > 0">
+                ,pic = #{pic}
+            </if>
+        </set>
+        <where>
+            eid = #{eid}
+        </where>
+    </update>
+
+    <!--select * from employee where eid in(1,2,3,4,5)-->
+    <!--按照一组id查一组数据-->
+    <select id="selectByIDS" parameterType="int[]" resultType="Employee">
+        select * from employee
+        <where>
+            <foreach collection="array" item="id" open="eid in(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+
+    <!--使用用户名查用户信息-->
+    <select id="selectEmployeeByUsername" parameterType="string" resultType="Employee">
+        select * from employee where username = #{name}
+    </select>
+
+    <!--修改密码-->
+    <update id="updatePassword">
+        update employee set password = #{np} where eid = #{eid}
+    </update>
+</mapper>

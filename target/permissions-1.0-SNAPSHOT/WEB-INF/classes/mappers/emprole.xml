@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.EmpRoleDao">
+
+    <!--添加数据-->
+    <insert id="insert" parameterType="EmpRole">
+        INSERT INTO emp_role
+        (
+            role_fk, 
+            emp_fk, 
+            erdis
+        )
+        VALUES
+        (
+            #{role_fk},
+            #{emp_fk},
+            #{erdis}
+        )
+    </insert>
+
+    <!--按照员工id删除中间表中此员工对应的数据-->
+    <delete id="deleteByEmpID" parameterType="int">
+        delete from emp_role where emp_fk = #{eid}
+    </delete>
+
+    <!--按照员工id查角色id-->
+    <select id="selectRoleIdByEmployeeID" parameterType="int" resultType="int">
+        SELECT role_fk FROM emp_role WHERE emp_fk = #{eid}
+    </select>
+
+
+    <!--通过用户id找一组角色id-->
+    <select id="selectRoleIds" parameterType="int" resultType="int">
+        SELECT role_fk FROM emp_role WHERE emp_fk = #{eid}
+    </select>
+</mapper>

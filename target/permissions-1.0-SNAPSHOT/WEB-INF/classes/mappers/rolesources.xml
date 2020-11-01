@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.RoleSourcesDao">
+
+    <!--添加数据-->
+    <insert id="insert" parameterType="RoleSources">
+        insert into role_sources(rsdis,resources_fk,role_fk) value(#{rsdis},#{resources_fk},#{role_fk})
+    </insert>
+
+    <!--按照角色id查中间表数据-->
+    <select id="selectRoleSourceByRoleID" parameterType="int" resultType="RoleSources">
+        SELECT * FROM role_sources WHERE role_fk = #{rid}
+    </select>
+
+    <!--按照角色id删除中间表数据-->
+    <delete id="deleteRoleID" parameterType="int">
+        delete from role_sources where role_fk = #{rid}
+    </delete>
+
+    <!--按照一组角色id，查对应的资源id-->
+    <!--SELECT resources_fk FROM role_sources WHERE role_fk IN( 8 )-->
+    <select id="selectSourceIdByRoleIds" resultType="int">
+        SELECT resources_fk FROM role_sources
+        <where>
+            <foreach collection="rids" item="rid" separator="," open="role_fk IN(" close=")">
+                #{rid}
+            </foreach>
+        </where>
+    </select>
+</mapper>

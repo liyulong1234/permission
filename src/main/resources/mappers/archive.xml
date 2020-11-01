@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.ArchiveDao">
+
+    <!--列表展示-查所有-->
+    <!--档案和员工关联查询，采用分表方案-->
+    <!--
+    `aid`,
+	`school`,
+	`degree`,
+	`specialty`,
+	`politicc`,
+	`email`,
+	`nation`,
+	`emergencyper`,
+	`emergencytel`,
+	`emp_fk`
+    -->
+    <resultMap id="ARCHIVEMAP" type="Archives">
+        <id column="aid" property="aid"/>
+        <result column="school" property="school"/>
+        <result column="degree" property="degree"/>
+        <result column="specialty" property="specialty"/>
+        <result column="politicc" property="politicc"/>
+        <result column="email" property="email"/>
+        <result column="nation" property="nation"/>
+        <result column="emergencyper" property="emergencyper"/>
+        <result column="emergencytel" property="emergencytel"/>
+        <result column="emp_fk" property="emp_fk"/>
+        <!--javatype指定的是user对象的属性的类型（例如id，posts），而oftype指定的是映射到list集合属性中pojo的类型（本例指的是post类型）-->
+        <!--一对一分表关联查询-->
+        <association property="employee" javaType="Employee" column="emp_fk" select="com.offcn.dao.EmployeeDao.selectByID"></association>
+    </resultMap>
+    <select id="selectList" resultMap="ARCHIVEMAP">
+        SELECT * FROM archives
+    </select>
+
+
+    <!--批量插入操作-->
+    <!--
+    INSERT INTO
+    archives(school,degree,specialty,politicc,email,nation,emergencyper,emergencytel,emp_fk)
+    VALUES
+    ('清华','大专','厨师','群众','qhqz@163.com','汉','小五','131',10),
+    ('北大','中专','挖掘机','团员','bdty@167.com','汉','小六','132',11),
+    ('厦大','本科','刺绣','预备役','xdcx@168.com','汉','小七','133',12)
+    -->
+    <insert id="insertArchs">
+        INSERT INTO
+        archives(school,degree,specialty,politicc,email,nation,emergencyper,emergencytel,emp_fk)
+        <foreach collection="list" item="arch" separator="," open="VALUES">
+            (#{arch.school},#{arch.degree},#{arch.specialty},#{arch.politicc},#{arch.email},#{arch.nation},#{arch.emergencyper},#{arch.emergencytel},#{arch.emp_fk})
+        </foreach>
+    </insert>
+</mapper>

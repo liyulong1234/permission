@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.offcn.dao.RoleDao">
+
+    <!--列表展示-查所有-->
+    <select id="selectList" resultType="Role">
+        select roleid,rolename,roledis,CASE STATUS WHEN 1 THEN 'on' WHEN 0 THEN NULL END staStr from role
+    </select>
+
+    <!--添加功能-->
+    <insert id="insert" parameterType="Role" keyProperty="roleid" useGeneratedKeys="true">
+        insert into role(rolename,roledis,status) value(#{rolename},#{roledis},#{status})
+    </insert>
+
+    <resultMap id="ROLEMAP" type="Role">
+        <id column="roleid" property="roleid"/>
+        <result column="rolename" property="rolename"/>
+        <result column="roledis" property="roledis"/>
+        <result column="staStr" property="staStr"/>
+
+        <!--分表查询方案-实现关联查询-->
+        <collection property="list" column="roleid" ofType="RoleSources" select="com.offcn.dao.RoleSourcesDao.selectRoleSourceByRoleID"></collection>
+    </resultMap>
+    <!--主键查询-->
+    <select id="selectByID" parameterType="int" resultMap="ROLEMAP">
+        select roleid,rolename,roledis,CASE STATUS WHEN 1 THEN 'on' WHEN 0 THEN NULL END staStr
+        from role
+        where roleid = #{rid}
+    </select>
+
+    <!--修改功能-->
+    <update id="update" parameterType="Role">
+        update role set rolename = #{rolename},roledis = #{roledis},status = #{status} where roleid = #{roleid}
+    </update>
+</mapper>
